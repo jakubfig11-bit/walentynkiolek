@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💌 Walentynka</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at top, #ffdde1, #ee9ca7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* ===== KOPERTA ===== */
+.envelope {
+    width: 260px;
+    height: 170px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 14px;
+    box-shadow: 0 25px 60px rgba(0,0,0,.3);
+    position: relative;
+    cursor: pointer;
+    animation: popIn 1.2s ease forwards;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.6) translateY(200px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.flap {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg,#ff758c,#ff7eb3);
+    clip-path: polygon(0 0,100% 0,50% 55%);
+    transform-origin: top;
+    transition: transform .9s cubic-bezier(.4,0,.2,1);
+}
+
+.envelope.open .flap {
+    transform: rotateX(180deg);
+}
+
+.tap {
+    position: absolute;
+    bottom: -42px;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-weight: 500;
+}
+
+/* ===== KARTKA ===== */
+.card {
+    position: absolute;
+    width: 340px;
+    padding: 26px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 22px;
+    text-align: center;
+    box-shadow: 0 30px 70px rgba(0,0,0,.35);
+    transform: translateY(220px) scale(.8);
+    opacity: 0;
+    transition: all 1s cubic-bezier(.4,0,.2,1);
+}
+
+.card.show {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.fade {
+    animation: fadeUp 1.1s ease forwards;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 24px;
+    border-radius: 24px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#yes {
+    background: linear-gradient(135deg,#ff416c,#ff4b2b);
+    color: white;
+}
+
+#no {
+    background: #ddd;
+    position: relative;
+}
+
+/* ===== LICZNIK ===== */
+#counter {
+    margin-top: 14px;
+    font-weight: bold;
+    color: #e91e63;
+}
+
+/* ===== GALERIA ===== */
+.gallery {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+}
+
+.gallery.show {
+    z-index: 1;
+    opacity: 1;
+}
+
+.slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    animation: slideShow 18s infinite;
+}
+
+.slide:nth-child(1){background-image:url("images/zdjecie1.jpg");}
+.slide:nth-child(2){background-image:url("images/zdjecie2.jpg");animation-delay:6s;}
+.slide:nth-child(3){background-image:url("images/zdjecie3.jpg");animation-delay:12s;}
+
+@keyframes slideShow {
+    10%{opacity:1;}
+    40%{opacity:1;transform:scale(1.06);}
+    60%{opacity:0;}
+}
+
+/* ===== SERCA ===== */
+.heart {
+    position: fixed;
+    bottom: -20px;
+    cursor: pointer;
+    animation: float 6s linear forwards;
+}
+
+@keyframes float {
+    to { transform: translateY(-120vh); opacity: 0; }
+}
+
+/* ===== KONFETTI ===== */
+.confetti {
+    position: fixed;
+    top: -10px;
+    width: 8px;
+    height: 14px;
+    animation: fall 4s linear forwards;
+}
+
+@keyframes fall {
+    to { transform: translateY(120vh) rotate(360deg); opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="envelope" id="envelope">
+    <div class="flap"></div>
+    <div class="tap">👆 Kliknij</div>
+</div>
+
+<div class="card" id="card">
+    <h1 class="fade">💖 Czy zostaniesz moją walentynką? 💖</h1>
+    <div class="buttons fade">
+        <button id="yes">TAK ❤️</button>
+        <button id="no">NIE 😅</button>
+    </div>
+    <p id="counter" class="fade"></p>
+</div>
+
+<div class="gallery" id="gallery">
+    <div class="slide"></div>
+    <div class="slide"></div>
+    <div class="slide"></div>
+</div>
+
+<script>
+const envelope = document.getElementById("envelope");
+const card = document.getElementById("card");
+const yesBtn = document.getElementById("yes");
+const noBtn = document.getElementById("no");
+const gallery = document.getElementById("gallery");
+
+/* KOPERTA */
+envelope.onclick = () => {
+    envelope.classList.add("open");
+    setTimeout(() => {
+        envelope.style.display = "none";
+        card.classList.add("show");
+    }, 700);
+};
+
+/* UCIEKAJĄCE NIE */
+function moveNo(){
+    noBtn.style.transform =
+        `translate(${Math.random()*220-110}px,${Math.random()*200-100}px)`;
+}
+noBtn.addEventListener("mouseenter", moveNo);
+noBtn.addEventListener("touchstart", moveNo);
+
+/* TAK */
+yesBtn.onclick = () => {
+    card.innerHTML = `
+        <h1 class="fade">💘 Wiedziałem 💘</h1>
+        <p class="fade">— Oluś ❤️</p>
+    `;
+    gallery.classList.add("show");
+    hearts();
+    confetti();
+
+    setTimeout(() => {
+        card.innerHTML = `
+            <h1 class="fade">🍕 Randka 🍕</h1>
+            <p class="fade">14 lutego, godz. 15:00</p>
+            <p class="fade">📍 Pizzeria Da Grasso</p>
+            <p class="fade">— Oluś ❤️</p>
+        `;
+    }, 2500);
+};
+
+/* SERCA */
+function hearts(){
+    setInterval(()=>{
+        const h=document.createElement("div");
+        h.className="heart";
+        h.innerHTML="❤️";
+        h.style.left=Math.random()*100+"vw";
+        h.style.fontSize=(Math.random()*20+14)+"px";
+        h.onclick=()=>alert("Kocham cie najmocniej na całym świecie!!!!!!!!! ❤");
+        document.body.appendChild(h);
+        setTimeout(()=>h.remove(),6000);
+    },400);
+}
+
+/* KONFETTI */
+function confetti(){
+    for(let i=0;i<130;i++){
+        const c=document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*100+"vw";
+        c.style.background=`hsl(${Math.random()*360},100%,70%)`;
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),4000);
+    }
+}
+
+/* LICZNIK */
+const startDate = new Date("2024-06-30T00:00:00");
+setInterval(()=>{
+    const days=Math.floor((new Date()-startDate)/(1000*60*60*24));
+    document.getElementById("counter").innerText =
+        `Jesteśmy razem już ${days} dni ❤️`;
+},1000);
+</script>
+
+</body>
+</html>
